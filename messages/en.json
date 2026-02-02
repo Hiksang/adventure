@@ -1,0 +1,73 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Retry",
+    "back": "Back",
+    "submit": "Submit",
+    "claim": "Claim",
+    "completed": "Completed",
+    "pending": "Pending"
+  },
+  "nav": {
+    "home": "Home",
+    "ads": "Ads",
+    "activities": "Activities",
+    "rewards": "Rewards",
+    "profile": "Profile"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "adsWatched": "Ads Watched",
+    "activitiesCompleted": "Activities Completed",
+    "totalXP": "Total XP",
+    "totalWLD": "Total WLD",
+    "level": "Level {level}",
+    "recentActivity": "Recent Activity"
+  },
+  "ads": {
+    "title": "Available Ads",
+    "watch": "Watch Ad",
+    "watchToEarn": "Watch to earn {xp} XP",
+    "completed": "Ad Completed!",
+    "earnedXP": "You earned {xp} XP",
+    "textAd": "Text Ad",
+    "videoAd": "Video Ad",
+    "duration": "{seconds}s"
+  },
+  "activities": {
+    "title": "Activities",
+    "enterCode": "Enter Code",
+    "codePlaceholder": "Enter your code here",
+    "takeQuiz": "Take Quiz",
+    "codeSuccess": "Code verified!",
+    "codeError": "Invalid code. Try again.",
+    "quizComplete": "Quiz completed! {correct}/{total} correct",
+    "earnedXP": "You earned {xp} XP"
+  },
+  "rewards": {
+    "title": "Rewards",
+    "summary": "Reward Summary",
+    "claimWLD": "Claim WLD",
+    "xpNeeded": "Need {xp} more XP to claim",
+    "history": "Reward History",
+    "noRewards": "No rewards yet",
+    "claimSuccess": "Successfully claimed {amount} WLD!",
+    "pendingWLD": "Pending WLD"
+  },
+  "profile": {
+    "title": "Profile",
+    "username": "Username",
+    "level": "Level",
+    "totalXP": "Total XP",
+    "verified": "World ID Verified",
+    "notVerified": "Not Verified",
+    "devMode": "DEV Mode Active"
+  },
+  "auth": {
+    "connectWallet": "Connect Wallet",
+    "verifyWorldID": "Verify with World ID",
+    "signOut": "Sign Out",
+    "devLogin": "Dev Login"
+  }
+}

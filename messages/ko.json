@@ -1,0 +1,73 @@
+{
+  "common": {
+    "loading": "로딩 중...",
+    "error": "문제가 발생했습니다",
+    "retry": "재시도",
+    "back": "뒤로",
+    "submit": "제출",
+    "claim": "수령",
+    "completed": "완료",
+    "pending": "대기 중"
+  },
+  "nav": {
+    "home": "홈",
+    "ads": "광고",
+    "activities": "활동",
+    "rewards": "리워드",
+    "profile": "프로필"
+  },
+  "dashboard": {
+    "title": "대시보드",
+    "adsWatched": "시청한 광고",
+    "activitiesCompleted": "완료한 활동",
+    "totalXP": "총 XP",
+    "totalWLD": "총 WLD",
+    "level": "레벨 {level}",
+    "recentActivity": "최근 활동"
+  },
+  "ads": {
+    "title": "광고 목록",
+    "watch": "광고 보기",
+    "watchToEarn": "{xp} XP 획득 가능",
+    "completed": "광고 시청 완료!",
+    "earnedXP": "{xp} XP를 획득했습니다",
+    "textAd": "텍스트 광고",
+    "videoAd": "비디오 광고",
+    "duration": "{seconds}초"
+  },
+  "activities": {
+    "title": "활동",
+    "enterCode": "코드 입력",
+    "codePlaceholder": "코드를 입력하세요",
+    "takeQuiz": "퀴즈 풀기",
+    "codeSuccess": "코드가 확인되었습니다!",
+    "codeError": "잘못된 코드입니다. 다시 시도하세요.",
+    "quizComplete": "퀴즈 완료! {correct}/{total} 정답",
+    "earnedXP": "{xp} XP를 획득했습니다"
+  },
+  "rewards": {
+    "title": "리워드",
+    "summary": "리워드 요약",
+    "claimWLD": "WLD 수령",
+    "xpNeeded": "수령까지 {xp} XP 더 필요",
+    "history": "리워드 내역",
+    "noRewards": "리워드가 없습니다",
+    "claimSuccess": "{amount} WLD를 성공적으로 수령했습니다!",
+    "pendingWLD": "대기 중인 WLD"
+  },
+  "profile": {
+    "title": "프로필",
+    "username": "사용자명",
+    "level": "레벨",
+    "totalXP": "총 XP",
+    "verified": "World ID 인증 완료",
+    "notVerified": "미인증",
+    "devMode": "DEV 모드 활성화"
+  },
+  "auth": {
+    "connectWallet": "지갑 연결",
+    "verifyWorldID": "World ID 인증",
+    "signOut": "로그아웃",
+    "devLogin": "개발자 로그인"
+  }
+}
