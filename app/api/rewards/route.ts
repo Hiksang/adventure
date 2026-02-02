@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ rewards: MOCK_REWARDS, summary });
   }
 
-  const { data: rewards } = await supabaseAdmin
+  const { data: rewards } = await supabaseAdmin!
     .from('rewards')
     .select('*')
     .eq('user_id', userId)

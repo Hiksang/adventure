@@ -53,7 +53,7 @@ export async function GET() {
     return NextResponse.json(MOCK_ADS);
   }
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabaseAdmin!
     .from('ads')
     .select('*')
     .eq('is_active', true)

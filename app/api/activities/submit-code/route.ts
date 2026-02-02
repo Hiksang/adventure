@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
   }
 
   // PROD: fetch activity from DB and validate
-  const { data: activity } = await supabaseAdmin
+  const { data: activity } = await supabaseAdmin!
     .from('activities')
     .select('*')
     .eq('id', activityId)

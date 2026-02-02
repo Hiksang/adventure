@@ -39,7 +39,7 @@ export async function GET() {
     return NextResponse.json(MOCK_ACTIVITIES);
   }
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabaseAdmin!
     .from('activities')
     .select('*')
     .eq('is_active', true)
