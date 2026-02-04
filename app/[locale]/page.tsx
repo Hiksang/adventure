@@ -6,6 +6,7 @@ import { FeedContainer } from '@/components/feed';
 import Loading from '@/components/ui/Loading';
 import AuthFlow from '@/components/auth/AuthFlow';
 import OnboardingFlow from '@/components/onboarding/OnboardingFlow';
+import LandingPage from '@/components/landing/LandingPage';
 import { useAuth } from '@/hooks/useAuth';
 import type { FeedItem, FeedResponse } from '@/types';
 import { formatWLD } from '@/lib/utils/rewards';
@@ -23,11 +24,20 @@ export default function FeedPage() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isNewUser, setIsNewUser] = useState(false);
   const [isMiniKitInstalled, setIsMiniKitInstalled] = useState<boolean | null>(null);
+  const [showLanding, setShowLanding] = useState(true);
+  const [showAuthFlow, setShowAuthFlow] = useState(false);
 
   // Check if MiniKit is installed
   useEffect(() => {
     setIsMiniKitInstalled(MiniKit.isInstalled());
   }, []);
+
+  // Skip landing if user is already authenticated
+  useEffect(() => {
+    if (user) {
+      setShowLanding(false);
+    }
+  }, [user]);
 
   // Track page view and session
   useEffect(() => {
@@ -106,6 +116,11 @@ export default function FeedPage() {
     setShowOnboarding(false);
   }, []);
 
+  const handleGetStarted = useCallback(() => {
+    setShowLanding(false);
+    setShowAuthFlow(true);
+  }, []);
+
   // Show loading while checking auth
   if (authLoading) {
     return (
@@ -115,13 +130,23 @@ export default function FeedPage() {
     );
   }
 
-  // Show auth flow if not authenticated (always show, will auto-mock in browser)
-  if (!user) {
+  // Show landing page for new visitors
+  if (!user && showLanding) {
+    return <LandingPage onGetStarted={handleGetStarted} />;
+  }
+
+  // Show auth flow after clicking "Get Started"
+  if (!user && showAuthFlow) {
     return (
       <AuthFlow onComplete={handleAuthComplete}>
         {/* After auth, show onboarding for new users */}
       </AuthFlow>
     );
+  }
+
+  // Fallback: show landing if somehow not user and not showing auth
+  if (!user) {
+    return <LandingPage onGetStarted={handleGetStarted} />;
   }
 
   // Show onboarding for new users
