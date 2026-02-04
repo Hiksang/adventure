@@ -1,30 +1,22 @@
 import { NextResponse } from 'next/server';
-import { completeAdView, getStats } from '@/lib/adViewStore';
+import { submitQuizAnswer } from '@/lib/quizStore';
 import { checkDailyLimit, recordXPEarned, getDailyStats } from '@/lib/dailyLimitStore';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { userId, adId, viewToken, expectedXP } = body;
+    const { userId, quizId, selectedIndex, expectedXP } = body;
 
-    if (!userId || !adId || !viewToken || typeof expectedXP !== 'number') {
+    if (!userId || !quizId || typeof selectedIndex !== 'number') {
       return NextResponse.json(
-        { success: false, error: 'Missing required fields: userId, adId, viewToken, expectedXP' },
+        { success: false, error: 'Missing required fields' },
         { status: 400 }
       );
     }
 
-    // Check daily limits first
-    const limitCheck = checkDailyLimit(userId, expectedXP, 'ad');
+    // Check daily limits
+    const limitCheck = checkDailyLimit(userId, expectedXP || 25, 'quiz');
     if (!limitCheck.allowed) {
-      console.warn('[AdView] Daily limit reached:', {
-        userId,
-        adId,
-        reason: limitCheck.reason,
-        currentXP: limitCheck.currentXP,
-        timestamp: new Date().toISOString(),
-      });
-
       return NextResponse.json(
         {
           success: false,
@@ -33,21 +25,18 @@ export async function POST(request: Request) {
           dailyStats: {
             currentXP: limitCheck.currentXP,
             remainingXP: limitCheck.remainingXP,
-            currentAdViews: limitCheck.currentAdViews,
-            remainingAdViews: limitCheck.remainingAdViews,
           },
         },
         { status: 429 }
       );
     }
 
-    const result = completeAdView(userId, adId, viewToken, expectedXP);
+    const result = submitQuizAnswer(userId, quizId, selectedIndex);
 
     if (!result.success) {
-      // Log suspicious activity
-      console.warn('[AdView] Failed completion attempt:', {
+      console.warn('[Quiz] Failed answer attempt:', {
         userId,
-        adId,
+        quizId,
         error: result.error,
         timestamp: new Date().toISOString(),
       });
@@ -62,16 +51,18 @@ export async function POST(request: Request) {
       );
     }
 
-    // Record XP earned for daily tracking
-    recordXPEarned(userId, result.xpAwarded, 'ad');
+    // Record XP if earned
+    if (result.xpAwarded > 0) {
+      recordXPEarned(userId, result.xpAwarded, 'quiz');
+    }
 
     // Get updated daily stats
     const dailyStats = getDailyStats(userId);
 
-    // In production: Save XP to database here
-    console.log('[AdView] XP awarded:', {
+    console.log('[Quiz] Answer submitted:', {
       userId,
-      adId,
+      quizId,
+      correct: result.correct,
       xp: result.xpAwarded,
       dailyTotal: dailyStats.xpEarned,
       timestamp: new Date().toISOString(),
@@ -79,25 +70,19 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
+      correct: result.correct,
       xpAwarded: result.xpAwarded,
-      message: 'Ad view completed',
       dailyStats: {
         currentXP: dailyStats.xpEarned,
         remainingXP: dailyStats.limits.MAX_XP_PER_DAY - dailyStats.xpEarned,
-        currentAdViews: dailyStats.adViews,
-        remainingAdViews: dailyStats.limits.MAX_AD_VIEWS_PER_DAY - dailyStats.adViews,
+        quizAnswers: dailyStats.quizAnswers,
+        remainingQuizzes: dailyStats.limits.MAX_QUIZ_PER_DAY - dailyStats.quizAnswers,
       },
     });
   } catch {
     return NextResponse.json(
-      { success: false, error: 'Failed to complete ad view' },
+      { success: false, error: 'Failed to submit quiz answer' },
       { status: 500 }
     );
   }
-}
-
-// GET endpoint for monitoring (optional)
-export async function GET() {
-  const stats = getStats();
-  return NextResponse.json({ stats });
 }

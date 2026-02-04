@@ -145,6 +145,7 @@ export default function FeedCard({ item, isActive, userId, onXPEarned, onQuizAns
       <div className="h-full w-full">
         <QuizCard
           quiz={item.quiz}
+          userId={userId}
           onAnswer={onQuizAnswer}
           onSkip={onQuizSkip}
         />
