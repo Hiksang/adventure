@@ -26,7 +26,7 @@ export default function TabNavigation({ locale }: { locale: string }) {
   const t = useTranslations('nav');
 
   return (
-    <nav className="bg-white border-t border-gray-200 pb-[env(safe-area-inset-bottom)] shrink-0">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 pb-[env(safe-area-inset-bottom)]">
       <div className="flex justify-around items-center h-16 max-w-[430px] mx-auto">
         {tabs.map((tab) => {
           const fullHref = `/${locale}${tab.href}`;
