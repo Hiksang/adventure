@@ -1,7 +1,6 @@
 'use client';
-import { useState, useCallback, ReactNode, useEffect } from 'react';
+import { useState, useCallback, ReactNode } from 'react';
 import { MiniKit, VerificationLevel } from '@worldcoin/minikit-js';
-import { isMiniKitAvailable } from '@/lib/auth/walletAuth';
 
 interface AuthFlowProps {
   onComplete: (data: {
@@ -16,31 +15,9 @@ export default function AuthFlow({ onComplete, children }: AuthFlowProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
-  const [miniKitInstalled, setMiniKitInstalled] = useState(false);
-
-  useEffect(() => {
-    setMiniKitInstalled(isMiniKitAvailable());
-  }, []);
 
   const handleVerify = useCallback(async () => {
     setError(null);
-
-    // If MiniKit is not installed (running in browser), use dev mode
-    if (!miniKitInstalled) {
-      console.log('[AuthFlow] MiniKit not installed, using dev mode');
-      const devNullifier = 'dev-nullifier-' + Date.now();
-      const devWallet = '0xDEV0000000000000000000000000000000000001';
-      setDone(true);
-      onComplete({
-        nullifierHash: devNullifier,
-        walletAddress: devWallet,
-        verificationLevel: 'device',
-      });
-      return;
-    }
-
-    // Real MiniKit authentication
-    console.log('[AuthFlow] MiniKit installed, using real verification');
     setLoading(true);
 
     try {
@@ -51,6 +28,7 @@ export default function AuthFlow({ onComplete, children }: AuthFlowProps) {
 
       if (result.finalPayload.status === 'error') {
         setError('Verification failed. Please try again.');
+        setLoading(false);
         return;
       }
 
@@ -67,7 +45,7 @@ export default function AuthFlow({ onComplete, children }: AuthFlowProps) {
       if (verifyRes.ok) {
         const data = await verifyRes.json();
 
-        // Get wallet address from MiniKit.user (no separate wallet auth needed!)
+        // Get wallet address from MiniKit.user
         const walletAddress = MiniKit.user?.walletAddress || '';
 
         console.log('[AuthFlow] Verification successful', {
@@ -92,7 +70,7 @@ export default function AuthFlow({ onComplete, children }: AuthFlowProps) {
     } finally {
       setLoading(false);
     }
-  }, [miniKitInstalled, onComplete]);
+  }, [onComplete]);
 
   if (done) {
     return <>{children}</>;
@@ -148,8 +126,6 @@ export default function AuthFlow({ onComplete, children }: AuthFlowProps) {
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 <span>Verifying...</span>
               </>
-            ) : !miniKitInstalled ? (
-              <span>Continue (Browser Mode)</span>
             ) : (
               <>
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

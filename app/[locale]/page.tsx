@@ -1,7 +1,6 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { MiniKit } from '@worldcoin/minikit-js';
 import { FeedContainer } from '@/components/feed';
 import Loading from '@/components/ui/Loading';
 import AuthFlow from '@/components/auth/AuthFlow';
@@ -23,14 +22,8 @@ export default function FeedPage() {
   const [wldBalance, setWldBalance] = useState<number>(0);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isNewUser, setIsNewUser] = useState(false);
-  const [isMiniKitInstalled, setIsMiniKitInstalled] = useState<boolean | null>(null);
   const [showLanding, setShowLanding] = useState(true);
   const [showAuthFlow, setShowAuthFlow] = useState(false);
-
-  // Check if MiniKit is installed
-  useEffect(() => {
-    setIsMiniKitInstalled(MiniKit.isInstalled());
-  }, []);
 
   // Skip landing if user is already authenticated
   useEffect(() => {
@@ -45,12 +38,12 @@ export default function FeedPage() {
     startSession(nullifierHash || undefined);
   }, [nullifierHash]);
 
-  // Update streak when user is active (only in World App)
+  // Update streak when user is active
   useEffect(() => {
-    if (nullifierHash && isMiniKitInstalled) {
+    if (nullifierHash) {
       updateStreak(nullifierHash).catch(console.error);
     }
-  }, [nullifierHash, isMiniKitInstalled]);
+  }, [nullifierHash]);
 
   // Load feed with user credentials for targeted ads
   useEffect(() => {
@@ -209,17 +202,6 @@ export default function FeedPage() {
         nullifierHash={nullifierHash || undefined}
         onLoadMore={loadMore}
       />
-
-      {/* Browser mode indicator (MiniKit not installed) */}
-      {isMiniKitInstalled === false && (
-        <div className="fixed bottom-20 left-4 right-4 z-40">
-          <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg px-3 py-2 text-center">
-            <span className="text-yellow-400 text-xs">
-              🌐 Browser Mode - Open in World App for real verification
-            </span>
-          </div>
-        </div>
-      )}
     </>
   );
 }

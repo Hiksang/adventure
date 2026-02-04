@@ -16,21 +16,9 @@ export interface WalletAuthResult {
 }
 
 /**
- * Check if MiniKit is available (running inside World App)
- */
-export function isMiniKitAvailable(): boolean {
-  return typeof window !== 'undefined' && MiniKit.isInstalled();
-}
-
-/**
  * Generate a nonce from server for SIWE
  */
 export async function fetchNonce(): Promise<string> {
-  // If not in World App, use dev nonce
-  if (!isMiniKitAvailable()) {
-    return `dev-nonce-${Date.now()}`;
-  }
-
   const response = await fetch('/api/auth/wallet/nonce', {
     method: 'POST',
   });
@@ -46,24 +34,9 @@ export async function fetchNonce(): Promise<string> {
 /**
  * Initiate Wallet Auth via MiniKit
  * Uses Sign-In with Ethereum (SIWE) for authentication
- *
- * If running outside World App (browser), returns mock data for development.
- * If running inside World App, uses real MiniKit authentication.
  */
 export async function initiateWalletAuth(): Promise<WalletAuthResult> {
-  // If not in World App, use dev mock
-  if (!isMiniKitAvailable()) {
-    console.log('[WalletAuth] MiniKit not installed, using dev mode');
-    return {
-      success: true,
-      walletAddress: '0xDEV0000000000000000000000000000000000001',
-      signature: 'dev-signature-' + Date.now(),
-    };
-  }
-
   try {
-    console.log('[WalletAuth] MiniKit installed, using real authentication');
-
     // Get nonce from server
     const nonce = await fetchNonce();
 

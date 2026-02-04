@@ -1,6 +1,5 @@
 'use client';
 import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
-import { MiniKit } from '@worldcoin/minikit-js';
 import type { User } from '@/types';
 
 interface AuthContextType {
@@ -49,8 +48,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Load stored auth on mount
   useEffect(() => {
     const loadStoredAuth = async () => {
-      const isMiniKitInstalled = MiniKit.isInstalled();
-
       try {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
@@ -59,27 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setVerificationLevel(auth.verificationLevel || null);
           setWalletAddress(auth.walletAddress || null);
 
-          // In browser mode (no MiniKit), just use stored data
-          if (!isMiniKitInstalled) {
-            console.log('[Auth] Browser mode - using stored auth data');
-            // Create a dev user based on stored auth
-            setUser({
-              id: `user-${auth.nullifierHash.slice(0, 8)}`,
-              wallet_address: auth.walletAddress || '0x0000000000000000000000000000000000000000',
-              username: 'User',
-              world_id_verified: true,
-              xp: 250,
-              level: 3,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              nullifier_hash: auth.nullifierHash,
-              verification_level: auth.verificationLevel || 'device',
-            });
-            setLoading(false);
-            return;
-          }
-
-          // Fetch user data from server (World App mode)
+          // Fetch user data from server
           const res = await fetch(`/api/auth/signup?nullifier_hash=${auth.nullifierHash}`);
           if (res.ok) {
             const data = await res.json();
@@ -109,7 +86,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     verificationLevel?: 'orb' | 'device';
   }) => {
     setLoading(true);
-    const isMiniKitInstalled = MiniKit.isInstalled();
 
     try {
       setNullifierHash(data.nullifierHash);
@@ -124,26 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(authData));
 
-      // In browser mode (no MiniKit), create local user
-      if (!isMiniKitInstalled) {
-        console.log('[Auth] Browser mode - creating local user');
-        setUser({
-          id: `user-${data.nullifierHash.slice(0, 8)}`,
-          wallet_address: data.walletAddress || '0x0000000000000000000000000000000000000000',
-          username: 'User',
-          world_id_verified: true,
-          xp: 0,
-          level: 1,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          nullifier_hash: data.nullifierHash,
-          verification_level: data.verificationLevel || 'device',
-        });
-        setLoading(false);
-        return;
-      }
-
-      // Create or get user from server (World App mode)
+      // Create or get user from server
       const signupRes = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -174,7 +131,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback(async () => {
     // Legacy login - now handled by AuthFlow
-    // Kept for backward compatibility
   }, []);
 
   const logout = useCallback(() => {
