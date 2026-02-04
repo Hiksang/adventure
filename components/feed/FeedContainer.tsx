@@ -6,10 +6,11 @@ import XPToast from './XPToast';
 
 interface FeedContainerProps {
   initialItems: FeedItem[];
+  userId?: string;
   onLoadMore?: () => Promise<FeedItem[]>;
 }
 
-export default function FeedContainer({ initialItems, onLoadMore }: FeedContainerProps) {
+export default function FeedContainer({ initialItems, userId, onLoadMore }: FeedContainerProps) {
   const [items, setItems] = useState<FeedItem[]>(initialItems);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [xpToast, setXpToast] = useState({ visible: false, amount: 0 });
@@ -134,6 +135,7 @@ export default function FeedContainer({ initialItems, onLoadMore }: FeedContaine
             <FeedCard
               item={item}
               isActive={index === currentIndex}
+              userId={userId}
               onXPEarned={handleXPEarned}
               onQuizAnswer={handleQuizAnswer}
               onQuizSkip={handleQuizSkip}

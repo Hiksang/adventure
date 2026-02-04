@@ -89,6 +89,7 @@ export default function FeedPage() {
 
       <FeedContainer
         initialItems={items}
+        userId={user.id}
         onLoadMore={loadMore}
       />
     </>

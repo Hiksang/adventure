@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import type { FeedItem } from '@/types';
 import AdOverlay from './AdOverlay';
 import QuizCard from './QuizCard';
@@ -7,22 +7,91 @@ import QuizCard from './QuizCard';
 interface FeedCardProps {
   item: FeedItem;
   isActive: boolean;
+  userId?: string;
   onXPEarned: (xp: number) => void;
   onQuizAnswer: (correct: boolean, xp: number) => void;
   onQuizSkip: () => void;
 }
 
-export default function FeedCard({ item, isActive, onXPEarned, onQuizAnswer, onQuizSkip }: FeedCardProps) {
+export default function FeedCard({ item, isActive, userId, onXPEarned, onQuizAnswer, onQuizSkip }: FeedCardProps) {
   const [watchProgress, setWatchProgress] = useState(0);
   const [xpAwarded, setXpAwarded] = useState(false);
+  const [viewToken, setViewToken] = useState<string | null>(null);
+  const [verificationStatus, setVerificationStatus] = useState<'idle' | 'started' | 'completed' | 'failed'>('idle');
   const progressInterval = useRef<NodeJS.Timeout | null>(null);
+  const startTimeRef = useRef<number>(0);
 
+  // Start ad view session with server
+  const startAdViewSession = useCallback(async () => {
+    if (!userId || !item.ad) return;
+
+    try {
+      const response = await fetch('/api/ad-view/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          adId: item.ad.id,
+          duration: item.ad.duration_seconds,
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success && data.viewToken) {
+        setViewToken(data.viewToken);
+        setVerificationStatus('started');
+        startTimeRef.current = Date.now();
+      }
+    } catch (error) {
+      console.error('Failed to start ad view session:', error);
+    }
+  }, [userId, item.ad]);
+
+  // Complete ad view session with server verification
+  const completeAdViewSession = useCallback(async () => {
+    if (!userId || !item.ad || !viewToken) return false;
+
+    try {
+      const response = await fetch('/api/ad-view/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          adId: item.ad.id,
+          viewToken,
+          expectedXP: item.ad.xp_reward,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setVerificationStatus('completed');
+        return true;
+      } else {
+        console.warn('Ad view verification failed:', data.error);
+        setVerificationStatus('failed');
+        return false;
+      }
+    } catch (error) {
+      console.error('Failed to complete ad view session:', error);
+      setVerificationStatus('failed');
+      return false;
+    }
+  }, [userId, item.ad, viewToken]);
+
+  // Handle ad watching
   useEffect(() => {
     if (!isActive || item.type !== 'ad' || xpAwarded) {
       if (progressInterval.current) {
         clearInterval(progressInterval.current);
       }
       return;
+    }
+
+    // Start server-side session
+    if (verificationStatus === 'idle') {
+      startAdViewSession();
     }
 
     const duration = item.ad?.duration_seconds || 10;
@@ -34,7 +103,17 @@ export default function FeedCard({ item, isActive, onXPEarned, onQuizAnswer, onQ
         const newProgress = prev + incrementPerInterval;
         if (newProgress >= 100 && !xpAwarded) {
           setXpAwarded(true);
-          onXPEarned(item.ad?.xp_reward || 50);
+
+          // Verify with server before awarding XP
+          completeAdViewSession().then(verified => {
+            if (verified) {
+              onXPEarned(item.ad?.xp_reward || 50);
+            } else {
+              // Server verification failed - don't award XP
+              console.warn('XP not awarded due to verification failure');
+            }
+          });
+
           if (progressInterval.current) {
             clearInterval(progressInterval.current);
           }
@@ -49,12 +128,15 @@ export default function FeedCard({ item, isActive, onXPEarned, onQuizAnswer, onQ
         clearInterval(progressInterval.current);
       }
     };
-  }, [isActive, item, xpAwarded, onXPEarned]);
+  }, [isActive, item, xpAwarded, verificationStatus, startAdViewSession, completeAdViewSession, onXPEarned]);
 
+  // Reset when leaving this card
   useEffect(() => {
     if (!isActive) {
       setWatchProgress(0);
       setXpAwarded(false);
+      setViewToken(null);
+      setVerificationStatus('idle');
     }
   }, [isActive]);
 
@@ -71,7 +153,6 @@ export default function FeedCard({ item, isActive, onXPEarned, onQuizAnswer, onQ
   }
 
   const isAd = item.type === 'ad';
-  const content = isAd ? item.ad : item.content;
   const mediaType = isAd ? item.ad?.type : item.content?.type;
   const mediaUrl = isAd ? item.ad?.url : item.content?.url;
   const creator = isAd ? item.ad?.brand : item.content?.creator;
@@ -115,6 +196,12 @@ export default function FeedCard({ item, isActive, onXPEarned, onQuizAnswer, onQ
             xpReward={item.ad.xp_reward}
             isSponsored={true}
           />
+          {/* Verification status indicator (subtle) */}
+          {verificationStatus === 'started' && (
+            <div className="absolute top-2 left-2">
+              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" title="Verified session" />
+            </div>
+          )}
         </>
       )}
 
