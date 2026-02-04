@@ -6,6 +6,7 @@ import Loading from '@/components/ui/Loading';
 import WalletAuthButton from '@/components/auth/WalletAuthButton';
 import DevModeToggle from '@/components/auth/DevModeToggle';
 import { ProfileHeader, StatsGrid, SettingsList } from '@/components/profile';
+import { CredentialSection } from '@/components/credentials';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocale } from '@/hooks/useLocale';
 import { calculateLevel } from '@/lib/utils/rewards';
@@ -23,7 +24,7 @@ interface UserStats {
 export default function ProfilePage() {
   const t = useTranslations('profile');
   const locale = useLocale();
-  const { user, logout } = useAuth();
+  const { user, logout, nullifierHash, verificationLevel } = useAuth();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<UserStats | null>(null);
 
@@ -81,6 +82,16 @@ export default function ProfilePage() {
     <Container className="pb-24">
       <ProfileHeader user={user} />
       <DevModeToggle />
+
+      {/* Credential Verification Section */}
+      {nullifierHash && verificationLevel && (
+        <div className="mt-4">
+          <CredentialSection
+            nullifierHash={nullifierHash}
+            verificationLevel={verificationLevel}
+          />
+        </div>
+      )}
 
       {stats && (
         <div className="mt-4">

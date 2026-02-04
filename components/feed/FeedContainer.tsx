@@ -16,10 +16,11 @@ interface ChallengeData {
 interface FeedContainerProps {
   initialItems: FeedItem[];
   userId?: string;
+  nullifierHash?: string;
   onLoadMore?: () => Promise<FeedItem[]>;
 }
 
-export default function FeedContainer({ initialItems, userId, onLoadMore }: FeedContainerProps) {
+export default function FeedContainer({ initialItems, userId, nullifierHash, onLoadMore }: FeedContainerProps) {
   const [items, setItems] = useState<FeedItem[]>(initialItems);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [xpToast, setXpToast] = useState({ visible: false, amount: 0 });

@@ -17,6 +17,11 @@ const MOCK_ADS: Ad[] = [
     duration_seconds: 15,
     is_active: true,
     created_at: new Date().toISOString(),
+    quiz: {
+      question: 'What does World ID verify?',
+      options: ['Your bank account', 'Your unique humanness', 'Your location', 'Your age'],
+      correct_index: 1,
+    },
   },
   {
     id: '2',
@@ -31,6 +36,11 @@ const MOCK_ADS: Ad[] = [
     duration_seconds: 30,
     is_active: true,
     created_at: new Date().toISOString(),
+    quiz: {
+      question: 'What does DeFi stand for?',
+      options: ['Digital Finance', 'Decentralized Finance', 'Defined Finance', 'Defiant Finance'],
+      correct_index: 1,
+    },
   },
   {
     id: '3',
@@ -45,6 +55,11 @@ const MOCK_ADS: Ad[] = [
     duration_seconds: 20,
     is_active: true,
     created_at: new Date().toISOString(),
+    quiz: {
+      question: 'What is the safest way to store crypto?',
+      options: ['Exchange wallet', 'Email attachment', 'Hardware wallet', 'Screenshot of keys'],
+      correct_index: 2,
+    },
   },
 ];
 

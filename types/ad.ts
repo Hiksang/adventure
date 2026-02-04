@@ -11,6 +11,7 @@ export interface Ad {
   duration_seconds: number;
   is_active: boolean;
   created_at: string;
+  quiz?: { question: string; options: string[]; correct_index: number };
 }
 
 export interface AdView {

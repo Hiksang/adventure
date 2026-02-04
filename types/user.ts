@@ -7,6 +7,10 @@ export interface User {
   level: number;
   created_at: string;
   updated_at: string;
+  // World ID fields
+  nullifier_hash?: string;
+  verification_level?: 'orb' | 'device';
+  world_id_verified_at?: string;
 }
 
 export interface UserXP {
