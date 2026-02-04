@@ -96,7 +96,7 @@ export default function OnboardingFlow({ onComplete, children }: OnboardingFlowP
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-blue-900 flex flex-col pb-24 overflow-y-auto overscroll-none">
+    <div className="h-full bg-gradient-to-br from-purple-900 via-black to-blue-900 flex flex-col">
       {/* Skip button */}
       <div className="flex justify-end p-3">
         <button
@@ -138,8 +138,8 @@ export default function OnboardingFlow({ onComplete, children }: OnboardingFlowP
         )}
       </div>
 
-      {/* Navigation */}
-      <div className="px-6 py-4 space-y-3">
+      {/* Navigation - 12px from tab bar per World guidelines */}
+      <div className="px-6 pb-3 pt-4 space-y-3">
         {/* Progress dots */}
         <div className="flex justify-center gap-2 mb-2">
           {STEP_ORDER.map((_, index) => (

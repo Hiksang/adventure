@@ -99,7 +99,7 @@ export default function AuthFlow({ onComplete, children }: AuthFlowProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-black flex flex-col items-center justify-center px-6 pb-24 overflow-y-auto overscroll-none">
+    <div className="h-full bg-gradient-to-br from-gray-900 via-purple-900 to-black flex flex-col items-center justify-center px-6 pb-3">
       {/* Error message */}
       {error && (
         <div className="mb-4 px-4 py-2.5 bg-red-500/10 border border-red-500/30 rounded-xl max-w-xs text-center">

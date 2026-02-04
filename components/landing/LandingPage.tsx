@@ -31,9 +31,9 @@ export default function LandingPage({ onGetStarted }: LandingPageProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-black flex flex-col pb-24 overflow-y-auto overscroll-none">
+    <div className="h-full bg-black flex flex-col">
       {/* Hero Section */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-6">
+      <div className="flex-1 flex flex-col items-center justify-center px-6">
         {/* Logo */}
         <div className="mb-4">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shadow-lg shadow-purple-500/30">
@@ -97,8 +97,8 @@ export default function LandingPage({ onGetStarted }: LandingPageProps) {
         </div>
       </div>
 
-      {/* Bottom CTA */}
-      <div className="px-6 py-4">
+      {/* Bottom CTA - 12px from tab bar per World guidelines */}
+      <div className="px-6 pb-3 pt-4">
         <button
           onClick={onGetStarted}
           className="w-full py-3 px-6 bg-gradient-to-r from-purple-500 to-blue-500 text-white font-semibold rounded-2xl shadow-lg shadow-purple-500/30 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
