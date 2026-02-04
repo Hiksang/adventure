@@ -96,9 +96,15 @@ export default function OnboardingFlow({ onComplete, children }: OnboardingFlowP
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-blue-900 flex flex-col">
+    <div
+      className="fixed inset-0 z-50 bg-gradient-to-br from-purple-900 via-black to-blue-900 flex flex-col overflow-hidden"
+      style={{
+        paddingTop: 'env(safe-area-inset-top)',
+        paddingBottom: 'env(safe-area-inset-bottom)',
+      }}
+    >
       {/* Skip button */}
-      <div className="flex justify-end p-4">
+      <div className="flex justify-end p-4 shrink-0">
         <button
           onClick={handleSkip}
           className="text-white/50 hover:text-white/80 text-sm px-4 py-2 transition-colors"
@@ -107,41 +113,43 @@ export default function OnboardingFlow({ onComplete, children }: OnboardingFlowP
         </button>
       </div>
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6">
-        {/* Icon */}
-        <div className="w-32 h-32 rounded-full bg-gradient-to-br from-purple-500/30 to-blue-500/30 flex items-center justify-center mb-8 backdrop-blur-sm border border-white/10">
-          {stepContent.icon}
-        </div>
-
-        {/* Text */}
-        <h1 className="text-3xl font-bold text-white text-center mb-4">
-          {stepContent.title}
-        </h1>
-        <p className="text-white/70 text-center max-w-sm mb-8">
-          {stepContent.description}
-        </p>
-
-        {/* Features */}
-        {stepContent.features && (
-          <div className="w-full max-w-sm space-y-3 mb-8">
-            {stepContent.features.map((feature, index) => (
-              <div
-                key={index}
-                className="flex items-center gap-3 bg-white/5 rounded-xl px-4 py-3 backdrop-blur-sm border border-white/10"
-              >
-                <span className="text-2xl">{feature.icon}</span>
-                <span className="text-white/80">{feature.text}</span>
-              </div>
-            ))}
+      {/* Main content - scrollable */}
+      <div className="flex-1 overflow-y-auto overscroll-none">
+        <div className="flex flex-col items-center justify-center min-h-full px-6 py-4">
+          {/* Icon */}
+          <div className="w-28 h-28 rounded-full bg-gradient-to-br from-purple-500/30 to-blue-500/30 flex items-center justify-center mb-6 backdrop-blur-sm border border-white/10 shrink-0">
+            {stepContent.icon}
           </div>
-        )}
+
+          {/* Text */}
+          <h1 className="text-2xl font-bold text-white text-center mb-3">
+            {stepContent.title}
+          </h1>
+          <p className="text-white/70 text-center max-w-sm mb-6 text-sm">
+            {stepContent.description}
+          </p>
+
+          {/* Features */}
+          {stepContent.features && (
+            <div className="w-full max-w-sm space-y-2 mb-4">
+              {stepContent.features.map((feature, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-3 bg-white/5 rounded-xl px-4 py-3 backdrop-blur-sm border border-white/10"
+                >
+                  <span className="text-xl">{feature.icon}</span>
+                  <span className="text-white/80 text-sm">{feature.text}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Navigation */}
-      <div className="p-6 space-y-4">
+      {/* Navigation - fixed at bottom */}
+      <div className="p-4 pb-6 space-y-3 shrink-0 bg-gradient-to-t from-black/50 to-transparent">
         {/* Progress dots */}
-        <div className="flex justify-center gap-2 mb-4">
+        <div className="flex justify-center gap-2 mb-2">
           {STEP_ORDER.map((_, index) => (
             <div
               key={index}
@@ -161,14 +169,14 @@ export default function OnboardingFlow({ onComplete, children }: OnboardingFlowP
           {currentStepIndex > 0 && (
             <button
               onClick={handleBack}
-              className="flex-1 py-4 px-6 bg-white/10 text-white font-semibold rounded-2xl border border-white/20"
+              className="flex-1 py-3 px-6 bg-white/10 text-white font-semibold rounded-2xl border border-white/20"
             >
               Back
             </button>
           )}
           <button
             onClick={handleNext}
-            className="flex-1 py-4 px-6 bg-gradient-to-r from-purple-500 to-blue-500 text-white font-semibold rounded-2xl shadow-lg shadow-purple-500/30"
+            className="flex-1 py-3 px-6 bg-gradient-to-r from-purple-500 to-blue-500 text-white font-semibold rounded-2xl shadow-lg shadow-purple-500/30"
           >
             {isLastStep ? 'Get Started' : 'Next'}
           </button>

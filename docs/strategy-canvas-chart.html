@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advertise 전략 캔버스</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      padding: 40px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      font-size: 32px;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+    .subtitle {
+      text-align: center;
+      color: #888;
+      margin-bottom: 40px;
+      font-size: 14px;
+    }
+    .chart-container {
+      background: #111;
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 30px;
+    }
+    .chart-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #fff;
+    }
+    .chart-wrapper {
+      height: 400px;
+      position: relative;
+    }
+    .legend-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #222;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #ccc;
+    }
+    .legend-color {
+      width: 24px;
+      height: 4px;
+      border-radius: 2px;
+    }
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+    .radar-container {
+      background: #111;
+      border-radius: 16px;
+      padding: 30px;
+    }
+    .radar-wrapper {
+      height: 320px;
+      position: relative;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+    .summary-card {
+      background: #1a1a1a;
+      border-radius: 12px;
+      padding: 20px 12px;
+      text-align: center;
+    }
+    .summary-card.highlight {
+      background: linear-gradient(135deg, #1a3a2a 0%, #0d1f15 100%);
+      border: 1px solid #2d5a3d;
+    }
+    .summary-score {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .summary-name {
+      font-size: 12px;
+      color: #888;
+    }
+    .highlight .summary-score {
+      color: #4ade80;
+    }
+    .insights {
+      background: #111;
+      border-radius: 16px;
+      padding: 30px;
+    }
+    .insights h3 {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+    .insight-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .insight-item {
+      background: #1a1a1a;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .insight-item h4 {
+      font-size: 14px;
+      color: #4ade80;
+      margin-bottom: 8px;
+    }
+    .insight-item p {
+      font-size: 13px;
+      color: #aaa;
+      line-height: 1.5;
+    }
+    .comparison-table {
+      background: #111;
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 30px;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 12px 16px;
+      text-align: center;
+      border-bottom: 1px solid #222;
+    }
+    th {
+      color: #888;
+      font-weight: 500;
+      font-size: 13px;
+    }
+    td {
+      font-size: 14px;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    .product-name {
+      text-align: left;
+      font-weight: 600;
+    }
+    .score-high { color: #4ade80; }
+    .score-mid { color: #eab308; }
+    .score-low { color: #ef4444; }
+    .advertise-row {
+      background: rgba(74, 222, 128, 0.1);
+    }
+    .advertise-row td {
+      color: #4ade80;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Advertise 전략 캔버스</h1>
+    <p class="subtitle">경쟁사 대비 7가지 핵심 기준 비교 분석 | Y축: 만족도 점수 (1-10) | X축: 핵심 기능 기준</p>
+
+    <div class="summary-grid">
+      <div class="summary-card highlight">
+        <div class="summary-score">8.6</div>
+        <div class="summary-name">Advertise</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-score" style="color: #eab308;">7.4</div>
+        <div class="summary-name">Mistplay</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-score" style="color: #f97316;">5.6</div>
+        <div class="summary-name">Brave</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-score" style="color: #a855f7;">5.4</div>
+        <div class="summary-name">Galxe</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-score" style="color: #14b8a6;">5.3</div>
+        <div class="summary-name">Permission</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-score" style="color: #3b82f6;">4.6</div>
+        <div class="summary-name">Sweatcoin</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-score" style="color: #ec4899;">4.1</div>
+        <div class="summary-name">Tap-to-Earn</div>
+      </div>
+    </div>
+
+    <div class="chart-container">
+      <div class="chart-title">전략 캔버스 (Strategy Canvas)</div>
+      <div class="chart-wrapper">
+        <canvas id="strategyCanvas"></canvas>
+      </div>
+      <div class="legend-container">
+        <div class="legend-item">
+          <div class="legend-color" style="background: #4ade80; height: 6px;"></div>
+          <span><strong>Advertise (우리)</strong></span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #eab308;"></div>
+          <span>Mistplay</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #f97316;"></div>
+          <span>Brave Rewards</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #a855f7;"></div>
+          <span>Galxe/Layer3</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #14b8a6;"></div>
+          <span>Permission.io</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #3b82f6;"></div>
+          <span>Sweatcoin</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #ec4899;"></div>
+          <span>Tap-to-Earn</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="radar-container">
+        <div class="chart-title">Advertise vs Web3 경쟁사</div>
+        <div class="radar-wrapper">
+          <canvas id="radarChart1"></canvas>
+        </div>
+      </div>
+      <div class="radar-container">
+        <div class="chart-title">Advertise vs Mistplay (Web2)</div>
+        <div class="radar-wrapper">
+          <canvas id="radarChart2"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="comparison-table">
+      <div class="chart-title">상세 점수 비교표</div>
+      <table>
+        <thead>
+          <tr>
+            <th style="text-align: left;">제품</th>
+            <th>출금 용이성</th>
+            <th>보상 가치</th>
+            <th>봇 방지</th>
+            <th>참여 품질</th>
+            <th>투명성</th>
+            <th>UX 단순성</th>
+            <th>지속가능성</th>
+            <th>종합</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="advertise-row">
+            <td class="product-name">Advertise</td>
+            <td>9</td>
+            <td>8</td>
+            <td>10</td>
+            <td>9</td>
+            <td>8</td>
+            <td>8</td>
+            <td>8</td>
+            <td>8.6</td>
+          </tr>
+          <tr>
+            <td class="product-name" style="color: #eab308;">Mistplay</td>
+            <td class="score-high">9</td>
+            <td class="score-mid">7</td>
+            <td class="score-mid">7</td>
+            <td class="score-mid">5</td>
+            <td class="score-high">8</td>
+            <td class="score-high">9</td>
+            <td class="score-mid">7</td>
+            <td>7.4</td>
+          </tr>
+          <tr>
+            <td class="product-name" style="color: #f97316;">Brave</td>
+            <td class="score-mid">7</td>
+            <td class="score-mid">5</td>
+            <td class="score-high">8</td>
+            <td class="score-mid">5</td>
+            <td class="score-low">3</td>
+            <td class="score-mid">6</td>
+            <td class="score-mid">5</td>
+            <td>5.6</td>
+          </tr>
+          <tr>
+            <td class="product-name" style="color: #a855f7;">Galxe</td>
+            <td class="score-low">4</td>
+            <td class="score-mid">7</td>
+            <td class="score-high">8</td>
+            <td class="score-low">4</td>
+            <td class="score-mid">5</td>
+            <td class="score-low">3</td>
+            <td class="score-mid">7</td>
+            <td>5.4</td>
+          </tr>
+          <tr>
+            <td class="product-name" style="color: #14b8a6;">Permission</td>
+            <td class="score-low">3</td>
+            <td class="score-mid">7</td>
+            <td class="score-mid">7</td>
+            <td class="score-mid">6</td>
+            <td class="score-low">4</td>
+            <td class="score-low">4</td>
+            <td class="score-mid">6</td>
+            <td>5.3</td>
+          </tr>
+          <tr>
+            <td class="product-name" style="color: #3b82f6;">Sweatcoin</td>
+            <td class="score-low">3</td>
+            <td class="score-low">4</td>
+            <td class="score-mid">5</td>
+            <td class="score-low">3</td>
+            <td class="score-mid">6</td>
+            <td class="score-high">9</td>
+            <td class="score-low">2</td>
+            <td>4.6</td>
+          </tr>
+          <tr>
+            <td class="product-name" style="color: #ec4899;">Tap-to-Earn</td>
+            <td class="score-mid">6</td>
+            <td class="score-low">4</td>
+            <td class="score-low">2</td>
+            <td class="score-low">2</td>
+            <td class="score-low">4</td>
+            <td class="score-high">10</td>
+            <td class="score-low">1</td>
+            <td>4.1</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="insights">
+      <h3>핵심 경쟁 우위</h3>
+      <div class="insight-grid">
+        <div class="insight-item">
+          <h4>봇 방지 10점 (1위)</h4>
+          <p>World ID로 1인 1계정 보장. 경쟁사 대비 +2~8점 격차. 광고주에게 <strong>"100% 실제 인간"</strong> 가치 제안.</p>
+        </div>
+        <div class="insight-item">
+          <h4>참여 품질 9점 (1위)</h4>
+          <p>퀴즈로 광고 이해도 검증. 단순 노출이 아닌 <strong>실제 리콜 측정</strong> 가능. 광고주 ROI 증명.</p>
+        </div>
+        <div class="insight-item">
+          <h4>출금 용이성 9점 (공동 1위)</h4>
+          <p>WLD 즉시 지급, 거래소 출금 가능. <strong>"진짜 돈을 번다"</strong>는 유저 신뢰 구축.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Strategy Canvas Line Chart
+    const ctx1 = document.getElementById('strategyCanvas').getContext('2d');
+    const labels = ['출금 용이성', '보상 가치', '봇 방지', '참여 품질', '투명성', 'UX 단순성', '지속가능성'];
+
+    new Chart(ctx1, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Advertise',
+            data: [9, 8, 10, 9, 8, 8, 8],
+            borderColor: '#4ade80',
+            backgroundColor: 'rgba(74, 222, 128, 0.15)',
+            borderWidth: 4,
+            pointRadius: 6,
+            pointBackgroundColor: '#4ade80',
+            fill: true,
+            tension: 0.2
+          },
+          {
+            label: 'Mistplay',
+            data: [9, 7, 7, 5, 8, 9, 7],
+            borderColor: '#eab308',
+            borderWidth: 2,
+            pointRadius: 4,
+            pointBackgroundColor: '#eab308',
+            tension: 0.2
+          },
+          {
+            label: 'Brave',
+            data: [7, 5, 8, 5, 3, 6, 5],
+            borderColor: '#f97316',
+            borderWidth: 2,
+            pointRadius: 4,
+            pointBackgroundColor: '#f97316',
+            tension: 0.2
+          },
+          {
+            label: 'Galxe',
+            data: [4, 7, 8, 4, 5, 3, 7],
+            borderColor: '#a855f7',
+            borderWidth: 2,
+            pointRadius: 4,
+            pointBackgroundColor: '#a855f7',
+            tension: 0.2
+          },
+          {
+            label: 'Permission',
+            data: [3, 7, 7, 6, 4, 4, 6],
+            borderColor: '#14b8a6',
+            borderWidth: 2,
+            pointRadius: 4,
+            pointBackgroundColor: '#14b8a6',
+            tension: 0.2
+          },
+          {
+            label: 'Sweatcoin',
+            data: [3, 4, 5, 3, 6, 9, 2],
+            borderColor: '#3b82f6',
+            borderWidth: 2,
+            pointRadius: 4,
+            pointBackgroundColor: '#3b82f6',
+            tension: 0.2
+          },
+          {
+            label: 'Tap-to-Earn',
+            data: [6, 4, 2, 2, 4, 10, 1],
+            borderColor: '#ec4899',
+            borderWidth: 2,
+            pointRadius: 4,
+            pointBackgroundColor: '#ec4899',
+            tension: 0.2
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#1a1a1a',
+            titleColor: '#fff',
+            bodyColor: '#ccc',
+            borderColor: '#333',
+            borderWidth: 1,
+            padding: 12
+          }
+        },
+        scales: {
+          y: {
+            min: 0,
+            max: 10,
+            ticks: { stepSize: 2, color: '#666' },
+            grid: { color: '#222' }
+          },
+          x: {
+            ticks: { color: '#888', font: { size: 12 } },
+            grid: { color: '#222' }
+          }
+        }
+      }
+    });
+
+    // Radar Chart 1: vs Web3
+    const ctx2 = document.getElementById('radarChart1').getContext('2d');
+    new Chart(ctx2, {
+      type: 'radar',
+      data: {
+        labels: ['출금', '보상', '봇방지', '참여품질', '투명성', 'UX', '지속성'],
+        datasets: [
+          {
+            label: 'Advertise',
+            data: [9, 8, 10, 9, 8, 8, 8],
+            borderColor: '#4ade80',
+            backgroundColor: 'rgba(74, 222, 128, 0.2)',
+            borderWidth: 3,
+            pointBackgroundColor: '#4ade80'
+          },
+          {
+            label: 'Brave',
+            data: [7, 5, 8, 5, 3, 6, 5],
+            borderColor: '#f97316',
+            backgroundColor: 'rgba(249, 115, 22, 0.1)',
+            borderWidth: 2,
+            pointBackgroundColor: '#f97316'
+          },
+          {
+            label: 'Galxe',
+            data: [4, 7, 8, 4, 5, 3, 7],
+            borderColor: '#a855f7',
+            backgroundColor: 'rgba(168, 85, 247, 0.1)',
+            borderWidth: 2,
+            pointBackgroundColor: '#a855f7'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { color: '#888', padding: 15, font: { size: 11 } }
+          }
+        },
+        scales: {
+          r: {
+            min: 0,
+            max: 10,
+            ticks: { stepSize: 2, color: '#666', backdropColor: 'transparent' },
+            grid: { color: '#333' },
+            pointLabels: { color: '#888', font: { size: 11 } }
+          }
+        }
+      }
+    });
+
+    // Radar Chart 2: vs Mistplay
+    const ctx3 = document.getElementById('radarChart2').getContext('2d');
+    new Chart(ctx3, {
+      type: 'radar',
+      data: {
+        labels: ['출금', '보상', '봇방지', '참여품질', '투명성', 'UX', '지속성'],
+        datasets: [
+          {
+            label: 'Advertise',
+            data: [9, 8, 10, 9, 8, 8, 8],
+            borderColor: '#4ade80',
+            backgroundColor: 'rgba(74, 222, 128, 0.2)',
+            borderWidth: 3,
+            pointBackgroundColor: '#4ade80'
+          },
+          {
+            label: 'Mistplay',
+            data: [9, 7, 7, 5, 8, 9, 7],
+            borderColor: '#eab308',
+            backgroundColor: 'rgba(234, 179, 8, 0.1)',
+            borderWidth: 2,
+            pointBackgroundColor: '#eab308'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { color: '#888', padding: 15, font: { size: 11 } }
+          }
+        },
+        scales: {
+          r: {
+            min: 0,
+            max: 10,
+            ticks: { stepSize: 2, color: '#666', backdropColor: 'transparent' },
+            grid: { color: '#333' },
+            pointLabels: { color: '#888', font: { size: 11 } }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
