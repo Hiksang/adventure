@@ -3,6 +3,15 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import type { FeedItem } from '@/types';
 import FeedCard from './FeedCard';
 import XPToast from './XPToast';
+import ChallengeModal from './ChallengeModal';
+
+interface ChallengeData {
+  id: string;
+  type: 'tap' | 'math' | 'swipe' | 'sequence';
+  question: string;
+  options?: string[];
+  timeoutMs: number;
+}
 
 interface FeedContainerProps {
   initialItems: FeedItem[];
@@ -14,6 +23,9 @@ export default function FeedContainer({ initialItems, userId, onLoadMore }: Feed
   const [items, setItems] = useState<FeedItem[]>(initialItems);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [xpToast, setXpToast] = useState({ visible: false, amount: 0 });
+  const [activeChallenge, setActiveChallenge] = useState<ChallengeData | null>(null);
+  const [isLocked, setIsLocked] = useState(false);
+  const [lockRemainingMs, setLockRemainingMs] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const touchStartY = useRef(0);
   const touchEndY = useRef(0);
@@ -91,8 +103,45 @@ export default function FeedContainer({ initialItems, userId, onLoadMore }: Feed
     }
   }, [currentIndex, items.length, onLoadMore]);
 
+  // Check for challenge when XP is earned
+  const checkForChallenge = useCallback(async () => {
+    if (!userId) return;
+
+    try {
+      const response = await fetch('/api/challenge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+
+      const data = await response.json();
+
+      if (data.isLocked) {
+        setIsLocked(true);
+        setLockRemainingMs(data.lockRemainingMs);
+        return;
+      }
+
+      if (data.needsChallenge && data.challenge) {
+        setActiveChallenge(data.challenge);
+      }
+    } catch (error) {
+      console.error('Failed to check challenge:', error);
+    }
+  }, [userId]);
+
+  const handleChallengeComplete = (success: boolean) => {
+    setActiveChallenge(null);
+    if (!success) {
+      // Optionally show a message that XP won't be awarded
+      console.log('Challenge failed - XP may not be awarded for next views');
+    }
+  };
+
   const handleXPEarned = (xp: number) => {
     setXpToast({ visible: true, amount: xp });
+    // Check if a challenge is needed after earning XP
+    checkForChallenge();
   };
 
   const handleXPToastHide = () => {
@@ -149,6 +198,29 @@ export default function FeedContainer({ initialItems, userId, onLoadMore }: Feed
         visible={xpToast.visible}
         onHide={handleXPToastHide}
       />
+
+      {/* Challenge Modal */}
+      {activeChallenge && userId && (
+        <ChallengeModal
+          challenge={activeChallenge}
+          userId={userId}
+          onComplete={handleChallengeComplete}
+          onClose={() => setActiveChallenge(null)}
+        />
+      )}
+
+      {/* Lock Message */}
+      {isLocked && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80">
+          <div className="bg-gray-900 rounded-2xl p-6 max-w-sm mx-4 text-center">
+            <div className="text-4xl mb-4">🔒</div>
+            <h2 className="text-white text-lg font-bold mb-2">Temporarily Locked</h2>
+            <p className="text-white/70">
+              Please wait {Math.ceil(lockRemainingMs / 1000)} seconds
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-1">
         {items.map((_, index) => (

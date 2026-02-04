@@ -123,5 +123,24 @@
     "verifyWorldID": "Verify with World ID",
     "signOut": "Sign Out",
     "devLogin": "Dev Login"
+  },
+  "challenge": {
+    "title": "Verify You're Human",
+    "description": "Complete the challenge below to continue",
+    "tapInstruction": "Tap the button {count} times",
+    "swipeInstruction": "Swipe {direction}",
+    "swipeHint": "Swipe on the screen",
+    "sequenceInstruction": "Tap the colors in order",
+    "sequenceProgress": "{current}/{total}",
+    "skip": "Skip (No XP)",
+    "success": "Verified!",
+    "failed": "Failed. Try again.",
+    "locked": "Temporarily locked",
+    "direction": {
+      "up": "up",
+      "down": "down",
+      "left": "left",
+      "right": "right"
+    }
   }
 }

@@ -123,5 +123,24 @@
     "verifyWorldID": "World ID 인증",
     "signOut": "로그아웃",
     "devLogin": "개발자 로그인"
+  },
+  "challenge": {
+    "title": "사람인지 확인",
+    "description": "계속하려면 아래 챌린지를 완료하세요",
+    "tapInstruction": "버튼을 {count}번 탭하세요",
+    "swipeInstruction": "{direction}으로 스와이프하세요",
+    "swipeHint": "화면을 스와이프하세요",
+    "sequenceInstruction": "순서대로 색상을 탭하세요",
+    "sequenceProgress": "{current}/{total}",
+    "skip": "건너뛰기 (XP 없음)",
+    "success": "확인 완료!",
+    "failed": "실패했습니다. 다시 시도하세요.",
+    "locked": "일시적으로 잠겼습니다",
+    "direction": {
+      "up": "위",
+      "down": "아래",
+      "left": "왼쪽",
+      "right": "오른쪽"
+    }
   }
 }
