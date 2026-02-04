@@ -35,7 +35,7 @@ export default async function LocaleLayout({
         <Providers locale={locale} messages={messages}>
           <div className="min-h-screen flex flex-col max-w-[430px] mx-auto">
             <ConditionalHeader />
-            <div className="flex-1">{children}</div>
+            <div className="flex-1 flex flex-col">{children}</div>
             <TabNavigation locale={locale} />
           </div>
         </Providers>

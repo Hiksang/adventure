@@ -31,7 +31,7 @@ export default function LandingPage({ onGetStarted }: LandingPageProps) {
   ];
 
   return (
-    <div className="h-full bg-black flex flex-col justify-between px-6 py-4">
+    <div className="flex-1 bg-black flex flex-col justify-between px-6 py-4">
       {/* Hero Section - centered content */}
       <div className="flex-1 flex flex-col items-center justify-center">
         {/* Logo */}

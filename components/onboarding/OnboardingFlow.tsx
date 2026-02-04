@@ -96,7 +96,7 @@ export default function OnboardingFlow({ onComplete, children }: OnboardingFlowP
   }
 
   return (
-    <div className="h-full bg-gradient-to-br from-purple-900 via-black to-blue-900 flex flex-col">
+    <div className="flex-1 bg-gradient-to-br from-purple-900 via-black to-blue-900 flex flex-col">
       {/* Skip button */}
       <div className="flex justify-end p-3">
         <button
