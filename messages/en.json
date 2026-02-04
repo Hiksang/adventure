@@ -10,11 +10,17 @@
     "pending": "Pending"
   },
   "nav": {
-    "home": "Home",
-    "ads": "Ads",
-    "activities": "Activities",
+    "feed": "Feed",
     "rewards": "Rewards",
     "profile": "Profile"
+  },
+  "feed": {
+    "welcomeMessage": "Watch ads, complete quizzes, earn rewards.",
+    "sponsored": "Sponsored",
+    "skip": "Skip",
+    "quizChallenge": "Quiz Challenge",
+    "correct": "Correct! 🎉",
+    "incorrect": "Wrong answer"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -22,8 +28,10 @@
     "activitiesCompleted": "Activities Completed",
     "totalXP": "Total XP",
     "totalWLD": "Total WLD",
-    "level": "Level {level}",
-    "recentActivity": "Recent Activity"
+    "level": "Lv.{level}",
+    "recentActivity": "Recent Activity",
+    "watchAds": "Watch Ads",
+    "doActivities": "Do Activities"
   },
   "ads": {
     "title": "Available Ads",
@@ -47,6 +55,31 @@
   },
   "rewards": {
     "title": "Rewards",
+    "myWLD": "My WLD",
+    "withdrawWLD": "Withdraw WLD",
+    "withdrawComingSoon": "Withdrawal feature coming soon!",
+    "giftcardStore": "Giftcard Store",
+    "purchaseHistory": "Purchase History",
+    "noPurchases": "No purchases yet",
+    "signInRequired": "Sign in to view rewards",
+    "category": {
+      "all": "All",
+      "cafe": "Cafe",
+      "food": "Food",
+      "convenience": "Convenience",
+      "movie": "Movie",
+      "game": "Game"
+    },
+    "selectAmount": "Select Amount",
+    "price": "Price",
+    "yourBalance": "Your Balance",
+    "insufficientBalance": "Insufficient WLD balance",
+    "cancel": "Cancel",
+    "purchase": "Purchase",
+    "processing": "Processing...",
+    "purchaseSuccess": "Purchase Successful!",
+    "barcode": "Barcode",
+    "done": "Done",
     "summary": "Reward Summary",
     "claimWLD": "Claim WLD",
     "xpNeeded": "Need {xp} more XP to claim",
@@ -60,9 +93,30 @@
     "username": "Username",
     "level": "Level",
     "totalXP": "Total XP",
-    "verified": "World ID Verified",
+    "totalWLD": "Total WLD",
+    "verified": "Verified",
     "notVerified": "Not Verified",
-    "devMode": "DEV Mode Active"
+    "devMode": "DEV Mode Active",
+    "signInRequired": "Sign in to view your profile",
+    "statistics": "Statistics",
+    "adsWatched": "Ads Watched",
+    "quizAccuracy": "Quiz Accuracy",
+    "streak": "Login Streak",
+    "count": "",
+    "days": " days",
+    "settings": "Settings",
+    "notifications": "Notifications",
+    "language": "Language",
+    "logout": "Log Out"
+  },
+  "analytics": {
+    "title": "Analytics",
+    "badges": "Badges",
+    "recentBadges": "Recent Badges",
+    "viewAll": "View All",
+    "weeklyLeaderboard": "Weekly Leaderboard",
+    "streak": "Streak",
+    "dailyGoal": "Daily Goal"
   },
   "auth": {
     "connectWallet": "Connect Wallet",

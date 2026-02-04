@@ -10,20 +10,28 @@
     "pending": "대기 중"
   },
   "nav": {
-    "home": "홈",
-    "ads": "광고",
-    "activities": "활동",
+    "feed": "피드",
     "rewards": "리워드",
     "profile": "프로필"
+  },
+  "feed": {
+    "welcomeMessage": "광고를 보고, 퀴즈를 풀고, 리워드를 받으세요.",
+    "sponsored": "스폰서",
+    "skip": "건너뛰기",
+    "quizChallenge": "퀴즈 챌린지",
+    "correct": "정답! 🎉",
+    "incorrect": "오답입니다"
   },
   "dashboard": {
     "title": "대시보드",
     "adsWatched": "시청한 광고",
     "activitiesCompleted": "완료한 활동",
     "totalXP": "총 XP",
-    "totalWLD": "총 WLD",
-    "level": "레벨 {level}",
-    "recentActivity": "최근 활동"
+    "totalWLD": "보유 WLD",
+    "level": "Lv.{level}",
+    "recentActivity": "최근 활동",
+    "watchAds": "광고 보기",
+    "doActivities": "활동 하기"
   },
   "ads": {
     "title": "광고 목록",
@@ -47,6 +55,31 @@
   },
   "rewards": {
     "title": "리워드",
+    "myWLD": "내 WLD",
+    "withdrawWLD": "WLD 출금",
+    "withdrawComingSoon": "출금 기능이 곧 추가됩니다!",
+    "giftcardStore": "기프티콘 스토어",
+    "purchaseHistory": "구매 내역",
+    "noPurchases": "구매 내역이 없습니다",
+    "signInRequired": "리워드를 보려면 로그인하세요",
+    "category": {
+      "all": "전체",
+      "cafe": "카페",
+      "food": "음식",
+      "convenience": "편의점",
+      "movie": "영화",
+      "game": "게임"
+    },
+    "selectAmount": "금액 선택",
+    "price": "가격",
+    "yourBalance": "내 잔액",
+    "insufficientBalance": "WLD 잔액이 부족합니다",
+    "cancel": "취소",
+    "purchase": "구매",
+    "processing": "처리 중...",
+    "purchaseSuccess": "구매 완료!",
+    "barcode": "바코드",
+    "done": "확인",
     "summary": "리워드 요약",
     "claimWLD": "WLD 수령",
     "xpNeeded": "수령까지 {xp} XP 더 필요",
@@ -60,9 +93,30 @@
     "username": "사용자명",
     "level": "레벨",
     "totalXP": "총 XP",
-    "verified": "World ID 인증 완료",
+    "totalWLD": "보유 WLD",
+    "verified": "인증됨",
     "notVerified": "미인증",
-    "devMode": "DEV 모드 활성화"
+    "devMode": "DEV 모드 활성화",
+    "signInRequired": "프로필을 보려면 로그인하세요",
+    "statistics": "통계",
+    "adsWatched": "시청한 광고",
+    "quizAccuracy": "퀴즈 정답률",
+    "streak": "연속 접속",
+    "count": "개",
+    "days": "일",
+    "settings": "설정",
+    "notifications": "알림 설정",
+    "language": "언어",
+    "logout": "로그아웃"
+  },
+  "analytics": {
+    "title": "분석",
+    "badges": "배지",
+    "recentBadges": "최근 배지",
+    "viewAll": "전체 보기",
+    "weeklyLeaderboard": "주간 리더보드",
+    "streak": "연속 접속",
+    "dailyGoal": "일일 목표"
   },
   "auth": {
     "connectWallet": "지갑 연결",

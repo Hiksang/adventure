@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import '../globals.css';
 import Providers from '../providers';
-import Header from '@/components/layout/Header';
+import ConditionalHeader from '@/components/layout/ConditionalHeader';
 import TabNavigation from '@/components/layout/TabNavigation';
 
 export const metadata: Metadata = {
@@ -34,7 +34,7 @@ export default async function LocaleLayout({
       <body className="bg-white text-black antialiased overscroll-none">
         <Providers locale={locale} messages={messages}>
           <div className="min-h-screen flex flex-col max-w-[430px] mx-auto">
-            <Header />
+            <ConditionalHeader />
             <div className="flex-1">{children}</div>
             <TabNavigation locale={locale} />
           </div>
