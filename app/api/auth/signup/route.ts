@@ -31,6 +31,22 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Require wallet_address for WLD rewards
+    if (!wallet_address) {
+      return NextResponse.json(
+        { error: 'WALLET_REQUIRED', message: 'Wallet address is required for WLD rewards' },
+        { status: 400 }
+      );
+    }
+
+    // Validate wallet address format
+    if (!/^0x[a-fA-F0-9]{40}$/.test(wallet_address)) {
+      return NextResponse.json(
+        { error: 'INVALID_WALLET', message: 'Invalid wallet address format' },
+        { status: 400 }
+      );
+    }
+
     if (!supabaseAdmin) {
       return NextResponse.json(
         { error: 'Database not configured' },

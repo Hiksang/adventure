@@ -1,0 +1,51 @@
+version: '3.8'
+
+# ===========================================
+# Development Docker Compose
+# DB + Redis only (App runs locally with pnpm dev)
+# ===========================================
+
+services:
+  # ===========================================
+  # PostgreSQL Database
+  # ===========================================
+  db:
+    image: postgres:15-alpine
+    container_name: adwatch-db-dev
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-adwatch}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-localdev123!}
+      - POSTGRES_DB=${POSTGRES_DB:-adwatch}
+    volumes:
+      - pgdata_dev:/var/lib/postgresql/data
+      - ./docker/init-db:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "5432:5432"  # Expose for local development
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-adwatch} -d ${POSTGRES_DB:-adwatch}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ===========================================
+  # Redis
+  # ===========================================
+  redis:
+    image: redis:7-alpine
+    container_name: adwatch-redis-dev
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-localredis123!}
+    volumes:
+      - redisdata_dev:/data
+    ports:
+      - "6379:6379"  # Expose for local development
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-localredis123!}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata_dev:
+  redisdata_dev:

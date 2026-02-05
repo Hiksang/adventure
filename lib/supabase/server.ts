@@ -8,3 +8,14 @@ export const supabaseAdmin: SupabaseClient | null =
     : IS_DEV
       ? null
       : (() => { throw new Error('Supabase credentials required in PROD mode'); })();
+
+/**
+ * Create a Supabase client for server-side operations
+ * Returns the admin client for server operations
+ */
+export async function createServerSupabaseClient(): Promise<SupabaseClient> {
+  if (!supabaseAdmin) {
+    throw new Error('Supabase is not configured');
+  }
+  return supabaseAdmin;
+}

@@ -1,35 +1,58 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { completeAdView, getStats } from '@/lib/adViewStore';
 import { checkDailyLimit, recordXPEarned, getDailyStats } from '@/lib/dailyLimitStore';
 import { supabaseAdmin } from '@/lib/supabase/server';
-import { IS_DEV } from '@/lib/env';
 import { behaviorTracker, shouldChallenge, shouldBlock } from '@/lib/antiAbuse/detector';
 import { updateWeeklyXP } from '@/lib/gamification/leaderboard';
 import { checkBadgesToAward } from '@/lib/gamification/badges';
 import { trackAdView } from '@/lib/analytics/events';
+import { earnCredits, getCreditConfig } from '@/lib/credits/service';
+import { checkCombinedRateLimit, getClientIP } from '@/lib/security/rateLimit';
+import {
+  parseJsonBody,
+  validateAdViewRequest,
+  validationError,
+} from '@/lib/security/validation';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { userId, adId, viewToken, expectedXP, nullifierHash, viewDuration } = body;
+    // Parse and validate request body
+    const { data: body, error: parseError } = await parseJsonBody<{
+      userId: string;
+      adId: string;
+      viewToken: string;
+      expectedXP: number;
+      nullifierHash: string;
+      viewDuration?: number;
+    }>(request);
 
-    // World ID required (except in DEV mode)
-    if (!IS_DEV && !nullifierHash) {
+    if (parseError || !body) {
       return NextResponse.json(
-        { success: false, error: 'WORLD_ID_REQUIRED', message: 'World ID verification is required' },
-        { status: 401 }
-      );
-    }
-
-    if (!userId || !adId || !viewToken || typeof expectedXP !== 'number') {
-      return NextResponse.json(
-        { success: false, error: 'Missing required fields: userId, adId, viewToken, expectedXP' },
+        { success: false, error: 'INVALID_REQUEST', message: parseError || 'Invalid request' },
         { status: 400 }
       );
     }
 
+    // Validate input
+    const validation = validateAdViewRequest(body);
+    if (!validation.valid) {
+      return NextResponse.json(
+        { success: false, error: 'VALIDATION_ERROR', details: validation.errors },
+        { status: 400 }
+      );
+    }
+
+    const { userId, adId, viewToken, expectedXP, nullifierHash, viewDuration } = validation.data!;
+
+    // Rate limiting
+    const ip = getClientIP(request);
+    const rateLimitResponse = checkCombinedRateLimit(nullifierHash, ip, 'adView');
+    if (rateLimitResponse) {
+      return rateLimitResponse;
+    }
+
     // Record behavior for anti-abuse analysis
-    if (nullifierHash && viewDuration) {
+    if (viewDuration) {
       behaviorTracker.recordView(nullifierHash, {
         timestamp: Date.now(),
         duration: viewDuration,
@@ -61,6 +84,7 @@ export async function POST(request: Request) {
         {
           success: false,
           error: limitCheck.reason,
+          creditsAwarded: 0,
           xpAwarded: 0,
           dailyStats: {
             currentXP: limitCheck.currentXP,
@@ -88,17 +112,26 @@ export async function POST(request: Request) {
         {
           success: false,
           error: result.error,
+          creditsAwarded: 0,
           xpAwarded: 0,
         },
         { status: 400 }
       );
     }
 
-    // Record XP earned for daily tracking
+    // Earn credits for the ad view
+    const creditResult = await earnCredits({
+      nullifierHash,
+      userId,
+      type: 'ad_view',
+      referenceId: adId,
+    });
+
+    // Record XP earned for daily tracking (keep for limit tracking)
     recordXPEarned(userId, result.xpAwarded, 'ad');
 
     // Update daily view stats (privacy-preserving: only aggregates)
-    if (nullifierHash && supabaseAdmin) {
+    if (supabaseAdmin) {
       await supabaseAdmin.rpc('increment_daily_view', {
         p_nullifier_hash: nullifierHash,
         p_xp_amount: result.xpAwarded,
@@ -106,31 +139,26 @@ export async function POST(request: Request) {
     }
 
     // Update weekly leaderboard
-    if (nullifierHash) {
-      await updateWeeklyXP(nullifierHash, result.xpAwarded);
-    }
+    await updateWeeklyXP(nullifierHash, result.xpAwarded);
 
     // Check for badges to award
-    if (nullifierHash) {
-      const dailyStats = getDailyStats(userId);
-      await checkBadgesToAward(nullifierHash, {
-        adViewCount: dailyStats.adViews,
-        totalXP: dailyStats.xpEarned,
-      });
-    }
+    const dailyStats = getDailyStats(userId);
+    await checkBadgesToAward(nullifierHash, {
+      adViewCount: dailyStats.adViews,
+      totalXP: dailyStats.xpEarned,
+    });
 
     // Track analytics
     trackAdView('complete', adId, result.xpAwarded, nullifierHash);
 
-    // Get updated daily stats
-    const dailyStats = getDailyStats(userId);
-
     // Check if challenge needed
-    const challengeCheck = nullifierHash ? shouldChallenge(nullifierHash) : { shouldChallenge: false };
+    const challengeCheck = shouldChallenge(nullifierHash);
 
-    console.log('[AdView] XP awarded:', {
+    console.log('[AdView] Credits awarded:', {
       userId,
       adId,
+      credits: creditResult.creditsEarned,
+      newBalance: creditResult.newBalance,
       xp: result.xpAwarded,
       dailyTotal: dailyStats.xpEarned,
       timestamp: new Date().toISOString(),
@@ -138,6 +166,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
+      creditsAwarded: creditResult.creditsEarned,
+      newCreditBalance: creditResult.newBalance,
       xpAwarded: result.xpAwarded,
       message: 'Ad view completed',
       dailyStats: {
@@ -148,7 +178,8 @@ export async function POST(request: Request) {
       },
       challengeRequired: challengeCheck.shouldChallenge,
     });
-  } catch {
+  } catch (error) {
+    console.error('[AdView] Error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to complete ad view' },
       { status: 500 }

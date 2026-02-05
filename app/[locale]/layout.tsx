@@ -4,6 +4,7 @@ import '../globals.css';
 import Providers from '../providers';
 import ConditionalHeader from '@/components/layout/ConditionalHeader';
 import TabNavigation from '@/components/layout/TabNavigation';
+import Eruda from '@/components/debug/Eruda';
 
 export const metadata: Metadata = {
   title: 'Advertise',
@@ -38,6 +39,7 @@ export default async function LocaleLayout({
             <div className="flex-1 flex flex-col">{children}</div>
             <TabNavigation locale={locale} />
           </div>
+          <Eruda />
         </Providers>
       </body>
     </html>

@@ -1,24 +1,109 @@
 version: '3.8'
 
+# ===========================================
+# Production Docker Compose
+# Self-hosted Backend + Private Database
+# ===========================================
+
 services:
-  supabase-db:
-    image: supabase/postgres:15.1.1.78
-    ports:
-      - '54322:5432'
+  # ===========================================
+  # Next.js Application
+  # ===========================================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: adwatch-app
+    restart: unless-stopped
     environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
+      - JWT_SECRET=${JWT_SECRET}
+      - NEXT_PUBLIC_WORLDCOIN_APP_ID=${WORLDCOIN_APP_ID}
+      - WORLDCOIN_APP_ID=${WORLDCOIN_APP_ID}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - internal
+    expose:
+      - "3000"
+    # 외부 포트 바인딩 없음 - Nginx를 통해서만 접근
+
+  # ===========================================
+  # PostgreSQL Database (Private)
+  # ===========================================
+  db:
+    image: postgres:15-alpine
+    container_name: adwatch-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     volumes:
-      - supabase-db:/var/lib/postgresql/data
-      - ./supabase/migrations:/docker-entrypoint-initdb.d
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/init-db:/docker-entrypoint-initdb.d:ro
+    networks:
+      - internal
+    # ports 없음 = 외부에서 접근 불가!
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  supabase-studio:
-    image: supabase/studio:20240101
+  # ===========================================
+  # Nginx Reverse Proxy
+  # ===========================================
+  nginx:
+    image: nginx:alpine
+    container_name: adwatch-nginx
+    restart: unless-stopped
     ports:
-      - '54323:3000'
-    environment:
-      STUDIO_PG_META_URL: http://supabase-meta:8080
-      SUPABASE_URL: http://supabase-kong:8000
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./docker/nginx/ssl:/etc/nginx/ssl:ro
+      - ./docker/nginx/cloudflare-ips.conf:/etc/nginx/cloudflare-ips.conf:ro
+    depends_on:
+      - app
+    networks:
+      - internal
+      - external
 
+  # ===========================================
+  # Redis (세션/캐시/Rate Limiting)
+  # ===========================================
+  redis:
+    image: redis:7-alpine
+    container_name: adwatch-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redisdata:/data
+    networks:
+      - internal
+    # ports 없음 = 외부에서 접근 불가!
+
+# ===========================================
+# Networks
+# ===========================================
+networks:
+  internal:
+    driver: bridge
+    internal: true  # 외부 인터넷 접근 차단!
+  external:
+    driver: bridge
+
+# ===========================================
+# Volumes
+# ===========================================
 volumes:
-  supabase-db:
+  pgdata:
+  redisdata:
